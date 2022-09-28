@@ -62,11 +62,154 @@
 ![image](https://user-images.githubusercontent.com/112868100/192853594-8d55897c-4934-4174-a7d6-84f04e24cb37.png)
 
 
+## Задание 2
+### В разделе «ход работы» пошагово выполнить каждый пункт с описанием и примером реализации задачи по теме лабораторной работы.
 
+Ход работы
+- 1.	Произвести подготовку данных для работы с алгоритмом линейной регрессии. 10 видов данных были установлены случайным образом, и данные находились в линейной зависимости. Данные преобразуются в формат массива, чтобы их можно было вычислить напрямую при использовании умножения и сложения.
+- 
+Код на Python в Google.Collab. Мы задаем случайные наборы данных и приводим их к массиву:
 
+![image](https://user-images.githubusercontent.com/112868100/192855218-f037082e-c7ba-463d-8da3-ab6747609883.png)
+
+Но для начала необходимо установить необходимые библиотеки matplotlib для отрисовки и numpy для вычислений. 
+
+![image](https://user-images.githubusercontent.com/112868100/192855027-b50a6de9-32d2-4fb5-a67b-01c9f68e1740.png)
+
+Затем мы отрисовываем наши данные на графике:
+
+![image](https://user-images.githubusercontent.com/112868100/192855936-492396ff-7f56-4302-aa45-3a9a9e8aea05.png)
+
+- 2.	Определите связанные функции. Функция модели: определяет модель линейной регрессии wx+b. 
 ```py
+def model(a, b, x):
+  return a*x + b
+```
 
-In [ ]:
+Функция потерь: функция потерь среднеквадратичной ошибки. 
+```py
+def loss_function(a, b, x, y):
+  num = len(x)
+  prediction = model(a, b, x)
+  return (0.5 / num) * (np.square(prediction - y)).sum()
+```
+
+Функция оптимизации: метод градиентного спуска для нахождения частных производных w и b.
+```py
+def optimize(a, b, x, y):
+  num = len(x)
+  prediction = model(a, b, x)
+  #Обновление значений a и b, поиском частных производных функций потерь на a и b
+  da = (1.0 / num) * ((prediction - y) * x).sum()
+  db = (1.0 / num) * ((prediction - y).sum())
+  a = a - Lr * da
+  b = b - Lr * db
+  return a, b
+```
+
+Функция итерации: возвращает значения a и b.
+```py
+def iterate(a, b, x, y, times):
+  for i in range(times):
+    a, b= optimize(a, b, x, y)
+  return a, b
+```
+
+- 3.	Начать итерацию.
+Шаг 1. Инициализация и модель итеративной оптимизации
+```py
+a = np.random.rand(1)
+print(a)
+b = np.random.rand(1)
+print(b)
+Lr = 0.000001
+
+a, b = iterate(a, b, x, y, 1)
+prediction = model(a, b, x)
+loss = loss_function(a, b, x, y)
+print(a, b, loss)
+plt.scatter(x, y)
+plt.plot(x, prediction)
+```
+
+Скриншот первой итерации:
+
+![image](https://user-images.githubusercontent.com/112868100/192857601-0d3d4693-eda7-4e5a-b722-ef43cb15e37c.png)
+
+Шаг 2. На второй итерации отображаются значения параметров, значения потерь и эффекты визуализации после итерации.
+```py
+a, b = iterate(a, b, x, y, 2)
+prediction = model(a, b, x)
+loss = loss_function(a, b, x, y)
+print(a, b, loss)
+plt.scatter(x, y)
+plt.plot(x, prediction)
+```
+
+Скриншот второй итерации:
+
+![image](https://user-images.githubusercontent.com/112868100/192857972-46f42a09-2fa4-4adf-ab17-27ac955aca92.png)
+
+
+Шаг 3. Третья итерация показывает значения параметров, значения потерь и эффекты визуализации после итерации.
+```py
+a, b = iterate(a, b, x, y, 3)
+prediction = model(a, b, x)
+loss = loss_function(a, b, x, y)
+print(a, b, loss)
+plt.scatter(x, y)
+plt.plot(x, prediction)
+```
+
+Скриншот третьей итерации:
+
+![image](https://user-images.githubusercontent.com/112868100/192858180-06c8ab54-990d-4989-ac37-b4e11c593898.png)
+
+Шаг 4. На четвертой итерации отображаются значения параметров, значения потерь и эффекты визуализации после итерации.
+```py
+a, b = iterate(a, b, x, y, 4)
+prediction = model(a, b, x)
+loss = loss_function(a, b, x, y)
+print(a, b, loss)
+plt.scatter(x, y)
+plt.plot(x, prediction)
+```
+
+Скриншот четвертой итерации:
+
+![image](https://user-images.githubusercontent.com/112868100/192858343-b40ed9d4-f921-4e1a-8c1a-3202bf55e021.png)
+
+Шаг 5. Пятая итерация показывает значения параметров, значения потерь и эффекты визуализации после итерации.
+```py
+a, b = iterate(a, b, x, y, 5)
+prediction = model(a, b, x)
+loss = loss_function(a, b, x, y)
+print(a, b, loss)
+plt.scatter(x, y)
+plt.plot(x, prediction)
+```
+
+Скриншот пятой итерации:
+
+![image](https://user-images.githubusercontent.com/112868100/192858518-f144dba7-589b-4e40-8d09-c9d295df6028.png)
+
+Шаг 6. 10000-я итерация, показывающая значения параметров, значения потерь и эффекты визуализации после итерации.
+```py
+a, b = iterate(a, b, x, y, 10000)
+prediction = model(a, b, x)
+loss = loss_function(a, b, x, y)
+print(a, b, loss)
+plt.scatter(x, y)
+plt.plot(x, prediction)
+```
+
+Скриншот шестой итерации:
+
+![image](https://user-images.githubusercontent.com/112868100/192858871-0ed9d245-b37d-4994-aeb1-4db752b0fcf7.png)
+
+
+
+In [ ]:
 #Import the required modules, numpy for calculation, and Matplotlib for drawing
 import numpy as np
 import matplotlib.pyplot as plt
@@ -82,16 +225,16 @@ y = np.array(y)
 #Show the effect of a scatter plot
 plt.scatter(x,y)
 
-```
+
 
 - Определите связанные функции. Функция модели: определяет модель линейной регрессии wx+b. Функция потерь: функция потерь среднеквадратичной ошибки. Функция оптимизации: метод градиентного спуска для нахождения частных производных w и b.
 
 
-## Задание 2
-### Должна ли величина loss стремиться к нулю при изменении исходных данных? Ответьте на вопрос, приведите пример выполнения кода, который подтверждает ваш ответ.
 
-- Перечисленные в этом туториале действия могут быть выполнены запуском на исполнение скрипт-файла, доступного [в репозитории](https://github.com/Den1sovDm1triy/hfss-scripting/blob/main/ScreatingSphereInAEDT.py).
-- Для запуска скрипт-файла откройте Ansys Electronics Desktop. Перейдите во вкладку [Automation] - [Run Script] - [Выберите файл с именем ScreatingSphereInAEDT.py из репозитория].
+
+
+
+
 
 ```py
 
