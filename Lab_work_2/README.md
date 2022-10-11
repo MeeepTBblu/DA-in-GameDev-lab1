@@ -1,5 +1,5 @@
 # АНАЛИЗ ДАННЫХ И ИСКУССТВЕННЫЙ ИНТЕЛЛЕКТ [in GameDev]
-Отчет по лабораторной работе #1 выполнил(а):
+Отчет по лабораторной работе #2 выполнил(а):
 - Мосин Дмитрий Сергеевич
 - РИ210936
 Отметка о выполнении заданий (заполняется студентом):
@@ -8,7 +8,7 @@
 | ------ | ------ | ------ |
 | Задание 1 | * | 60 |
 | Задание 2 | * | 20 |
-| Задание 3 | # | 20 |
+| Задание 3 | * | 20 |
 
 знак "*" - задание выполнено; знак "#" - задание не выполнено;
 
@@ -35,190 +35,441 @@
 - ✨Magic ✨
 
 ## Цель работы
-Ознакомиться с основными операторами зыка Python на примере реализации линейной регрессии.
+Познакомиться с программными средствами для организции передачи данных между инструментами google, Python и Unity
+
+## Постановка задачи.
+В данной лабораторной работе на языке python будет реализован функционал, позволяющий генерировать стоимость товара (ресурса или игрового объекта) в виде набора данных. Созданный набор данных будет передан в google-таблицу с целью возможности дальнейшего их наглядного представляния и оптимизации. Также в этой лабораторной работе на движке Unity будет реализован функционал, позволяющий воспроизводить аудио-файлы со звуковой информацией в зависимости от значений входного набора данных из таблицы.
+Позднее, в следующей лабораторной работе мы будем изменять стоимость указанного товара (ресурса или игрового объекта) через ML-агент. Далее стоимость товара будет меняться  в зависимости от прочих переменных (например, колличества собранного золота, скорости добычи сырья, скорости передвижения неигрового персонажа от рудника до города и пр). На основе указанных переменных мы научим ML-агент не выходить за пределы темпа инфляции.
 
 ## Задание 1
-### Написать программы Hello World на Python и Unity. 
+### Реализовать совместную работу и передачу данных в связке Python - Google-Sheets – Unity. При выполнении задания используйте видео-материалы и исходные данные, предоставленные преподавателя курса.
 Ход работы:
-- Для Python в отчете привести скриншоты с демонстрацией сохранения документа google.colab на свой диск с запуском программы, выводящей сообщение Hello World.
-Скриншот запуска кода print('Hello, World') на Python в Google.colab:
+- В облачном сервисе google console подключить API для работы с google sheets и google drive.
 
-![image](https://user-images.githubusercontent.com/112868100/192851723-67302cc3-6474-4b05-be13-576eb9a9b5b5.png)
+Создаем новый проект в Console Cloud Google. Затем подключаем Google Sheets API и Google Drive Api из встроенного маркетплейса. После нам необходимо создать Service Account и указать в нем роль "Editor". 
 
-Скриншот сохранения блокнота (кода) на Google.Disk:
+![image](https://user-images.githubusercontent.com/112868100/195110035-a1220b81-b206-44a7-85c1-bef0f7dc03cb.png)
 
-![image](https://user-images.githubusercontent.com/112868100/192852402-1c4f1d82-d9dd-451f-bba9-26ed81917840.png)
+После этого нам нужно выгрузить API-ключ и созранить его в наш проект на PyCharm.
 
--Для Unity  в отчете привести скришноты вывода сообщения Hello World в консоль.
+![image](https://user-images.githubusercontent.com/112868100/195110699-1c041dc0-fd69-48fa-94a1-eef16389ada1.png)
 
-Скриншот кода print('Hello, World') на Unity:
+Далее нам необходимо скопировать email сгенерированный на нашем аккаунте, создать пустуой файл в сервисе Google таблицы, и добавить этот майл как пользователя-редактора
 
-![image](https://user-images.githubusercontent.com/112868100/192853120-122a75d4-056d-492f-8963-bf08264da99f.png)
+![image](https://user-images.githubusercontent.com/112868100/195111857-27c3c701-7cab-459b-9cc8-f057b0928a81.png)
 
-Для выполнения скрипта, недостаточно запуска самого проекта, необходимо привязать скрипт к какому-либо объекту:
+В нашем проекте на Pycharm в Settings -> Project Interpretator устонавливаем пакет Google Spreadsheets Python API:
 
-Скриншот вывода 'Hello,World' в консоль: 
+![image](https://user-images.githubusercontent.com/112868100/195113239-95647ce7-7f5c-46ea-bfa9-adedc7d5fb9b.png)
 
-![image](https://user-images.githubusercontent.com/112868100/192853594-8d55897c-4934-4174-a7d6-84f04e24cb37.png)
+И пакет Numpy:
+
+![image](https://user-images.githubusercontent.com/112868100/195113869-f75488ce-1a01-4fd1-9887-c4fb682036f8.png)
+
+
+- Реализовать запись данных из скрипта на python в google-таблицу. Данные описывают изменение темпа инфляции на протяжении 11 отсчётных периодов, с учётом стоимости игрового объекта в каждый период.
+
+Пишем код как показано в видеоуроке от преподавателей:
+
+```py
+import gspread
+import numpy as np
+gs = gspread.service_account(filename='centering-talon-365213-6b629bd0007a.json')
+sheet = gs.open('UnityData')
+price = np.random.randint(2000, 10000, 11)
+mon = list(range(1, 11))
+i = 0
+while i <= len(mon):
+    i += 1
+    if i == 0:
+        continue
+    else:
+        temp_inf = ((price[i - 1] - price[i - 2]) / price[i - 2]) * 100
+        temp_inf = str(temp_inf)
+        temp_inf = temp_inf.replace('.', ',')
+        sheet.sheet1.update(('A' + str(i)), str(i))
+        sheet.sheet1.update(('B' + str(i)), str(price[i - 1]))
+        sheet.sheet1.update(('C' + str(i)), str(temp_inf))
+        print(temp_inf)
+        
+```
+Данные описывают изменение темпа инфляции на протяжении 11 отсчётных периодов, с учётом стоимости игрового объекта в каждый период.
+Запустив программу, в консоли постепенно появляются числа, а так же они записываются в нашу Google таблицу:
+
+![image](https://user-images.githubusercontent.com/112868100/195125592-c78e7144-2b63-4777-9cd7-e683d39f1b19.png)
+![image](https://user-images.githubusercontent.com/112868100/195125642-d28994ba-9a29-4f9b-a4dd-fc7871294579.png)
+
+
+- Создать новый проект на Unity, который будет получать данные из google-таблицы, в которую были записаны данные в предыдущем пункте.
+
+Создаем API-key:
+
+![image](https://user-images.githubusercontent.com/112868100/195126487-65c046ce-21db-4d0d-9de4-2ff518afde66.png)
+
+Restrict key GoogleShhets API:
+
+![image](https://user-images.githubusercontent.com/112868100/195127280-c9e032d7-a772-47ad-85b5-0fcaa2691dad.png)
+
+В таблицах открываем общий доступ:
+
+![image](https://user-images.githubusercontent.com/112868100/195127698-28d97366-c097-4b8a-b8d9-b2a8d77771ea.png)
+
+Создаем 3D проект на Unity:
+
+![image](https://user-images.githubusercontent.com/112868100/195127992-90994a54-aa62-43b7-b6bd-5f16423f89cd.png)
+
+Импортируем два файла в наш проект "soundPackage.unitypackage" и "jsonPackage.unitypackage"
+
+![image](https://user-images.githubusercontent.com/112868100/195139429-237cca89-d760-47a3-8cbd-0acfc6b15c80.png)
+
+Создаем пустой объект и добавляем в него компонент "Audio source"
+
+![image](https://user-images.githubusercontent.com/112868100/195141259-fbea220c-b3d9-46c4-9971-12e66730a573.png)
+
+В добавленной папке "Script" создаем пустой скрипт, и открываем его
+
+![image](https://user-images.githubusercontent.com/112868100/195141754-a1ded99f-5dad-4c8b-9932-b1c72cb33c50.png)
+![image](https://user-images.githubusercontent.com/112868100/195141877-5dd18164-b7da-4b3d-a45b-e09ac6c39d43.png)
+
+В файле пишем код по видеоуроку, не забывая о ссылке на нашу таблицу и ключе
+
+```py
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.Networking;
+using SimpleJSON;
+
+public class NewBehaviourScript : MonoBehaviour
+{
+    public AudioClip goodSpeak;
+    public AudioClip normalSpeak;
+    public AudioClip badSpeak;
+    private AudioSource selectAudio;
+    private Dictionary<string, float> dataSet = new Dictionary<string, float>();
+    private bool statusStart = false;
+    private int i = 1;
+
+    // Start is called before the first frame update
+    void Start()
+    {
+        StartCoroutine(GoogleSheets());
+    }
+
+    // Update is called once per frame
+    void Update()
+    {
+
+    }
+
+    IEnumerator GoogleSheets()
+    {
+        UnityWebRequest curentResp = UnityWebRequest.Get("https://sheets.googleapis.com/v4/spreadsheets/12vWQZ3B0NlPQ5amR_TX8YlyQPzmuG5wf9i2bFTItiXw/values/Лист1?key=AIzaSyBzex2EJDWrRDwuE_F-36qc-8pM6mvfDao");
+        yield return curentResp.SendWebRequest();
+        string rawResp = curentResp.downloadHandler.text;
+        var rawJson = JSON.Parse(rawResp);
+        foreach (var itemRawJson in rawJson["values"])
+        {
+            var parseJson = JSON.Parse(itemRawJson.ToString());
+            var selectRow = parseJson[0].AsStringList;
+            dataSet.Add(("Mon_" + selectRow[0]), float.Parse(selectRow[2]));
+        }
+        Debug.Log(dataSet["Mon_1"]);
+    }
+
+}
+```
+
+Запускаем, и видим, что значение в консоли совпадает со значением в таблице
+
+![image](https://user-images.githubusercontent.com/112868100/195152505-75ac8447-ab87-4043-bfe4-0610095910d8.png)
+![image](https://user-images.githubusercontent.com/112868100/195152573-56dd0bff-be60-415c-8186-5634afc84e2e.png)
+
+
+- Написать функционал на Unity, в котором будет воспризводиться аудио-файл в зависимости от значения данных из таблицы.
+
+Дописываем код по видеоуроку:
+
+```py
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.Networking;
+using SimpleJSON;
+
+public class NewBehaviourScript : MonoBehaviour
+{
+    public AudioClip goodSpeak;
+    public AudioClip normalSpeak;
+    public AudioClip badSpeak;
+    private AudioSource selectAudio;
+    private Dictionary<string,float> dataSet = new Dictionary<string, float>();
+    private bool statusStart = false;
+    private int i = 1;
+
+    // Start is called before the first frame update
+    void Start()
+    {
+        StartCoroutine(GoogleSheets());
+    }
+
+    // Update is called once per frame
+    void Update()
+    {
+        if (dataSet["Mon_" + i.ToString()] <= 10 & statusStart == false & i != dataSet.Count)
+        {
+            StartCoroutine(PlaySelectAudioGood());
+            Debug.Log(dataSet["Mon_" + i.ToString()]);
+        }
+
+        if (dataSet["Mon_" + i.ToString()] > 10 & dataSet["Mon_" + i.ToString()] < 100 & statusStart == false & i != dataSet.Count)
+        {
+            StartCoroutine(PlaySelectAudioNormal());
+            Debug.Log(dataSet["Mon_" + i.ToString()]);
+        }
+
+        if (dataSet["Mon_" + i.ToString()] >= 100 & statusStart == false & i != dataSet.Count)
+        {
+            StartCoroutine(PlaySelectAudioBad());
+            Debug.Log(dataSet["Mon_" + i.ToString()]);
+        }
+    }
+
+    IEnumerator GoogleSheets()
+    {
+        UnityWebRequest curentResp = UnityWebRequest.Get("https://sheets.googleapis.com/v4/spreadsheets/12vWQZ3B0NlPQ5amR_TX8YlyQPzmuG5wf9i2bFTItiXw/values/Лист1?key=AIzaSyBzex2EJDWrRDwuE_F-36qc-8pM6mvfDao");
+        yield return curentResp.SendWebRequest();
+        string rawResp = curentResp.downloadHandler.text;
+        var rawJson = JSON.Parse(rawResp);
+        foreach (var itemRawJson in rawJson["values"])
+        {
+            var parseJson = JSON.Parse(itemRawJson.ToString());
+            var selectRow = parseJson[0].AsStringList;
+            dataSet.Add(("Mon_" + selectRow[0]), float.Parse(selectRow[2]));
+        }
+    }
+
+    IEnumerator PlaySelectAudioGood()
+    {
+        statusStart = true;
+        selectAudio = GetComponent<AudioSource>();
+        selectAudio.clip = goodSpeak;
+        selectAudio.Play();
+        yield return new WaitForSeconds(3);
+        statusStart = false;
+        i++;
+    }
+    IEnumerator PlaySelectAudioNormal()
+    {
+        statusStart = true;
+        selectAudio = GetComponent<AudioSource>();
+        selectAudio.clip = normalSpeak;
+        selectAudio.Play();
+        yield return new WaitForSeconds(3);
+        statusStart = false;
+        i++;
+    }
+    IEnumerator PlaySelectAudioBad()
+    {
+        statusStart = true;
+        selectAudio = GetComponent<AudioSource>();
+        selectAudio.clip = badSpeak;
+        selectAudio.Play();
+        yield return new WaitForSeconds(4);
+        statusStart = false;
+        i++;
+    }
+}
+}
+```
+
+Присваиваем переменным соотвествующие аудиодорожки
+
+![image](https://user-images.githubusercontent.com/112868100/195160342-fa1a598d-7d14-4708-995c-19000dae2825.png)
+
+Теперь в консоли выводятся все данные из Google таблицы и аудио-дорожка соотвествующая значению: 
+- для значений меньше 10: "Люди восхищаются Вами, мой Лорд"
+- для значений в диапозоне от 10 до 100: "Люди доверяют Вам, милорд"
+- для значение больших 100: "Вы самый жестокий тиран в королестве, Ваша Светлость".
+
+![image](https://user-images.githubusercontent.com/112868100/195160719-75a8e930-e4f3-41d6-823f-a1f30f56db1f.png)
+
 
 
 ## Задание 2
-### В разделе «ход работы» пошагово выполнить каждый пункт с описанием и примером реализации задачи по теме лабораторной работы.
+### Реализовать запись в Google-таблицу набора данных, полученных с помощью линейной регрессии из лабораторной работы № 1. 
 
-Ход работы
-- 1)	Произвести подготовку данных для работы с алгоритмом линейной регрессии. 10 видов данных были установлены случайным образом, и данные находились в линейной зависимости. Данные преобразуются в формат массива, чтобы их можно было вычислить напрямую при использовании умножения и сложения.
 
-Код на Python в Google.Collab. Мы задаем случайные наборы данных и приводим их к массиву:
+Очистим таблицу от наших данных, и перепишем код в соотвествии с заданием
 
-![image](https://user-images.githubusercontent.com/112868100/192855218-f037082e-c7ba-463d-8da3-ab6747609883.png)
+![image](https://user-images.githubusercontent.com/112868100/195161496-9037bbc8-841d-43f2-8bf0-9f18e0997f31.png)
 
-Но для начала необходимо установить необходимые библиотеки matplotlib для отрисовки и numpy для вычислений. 
 
-![image](https://user-images.githubusercontent.com/112868100/192855027-b50a6de9-32d2-4fb5-a67b-01c9f68e1740.png)
+Большая часть кода (а именно функции) остаются без изменений, меняется только обработка итераций
 
-Затем мы отрисовываем наши данные на графике:
-
-![image](https://user-images.githubusercontent.com/112868100/192855936-492396ff-7f56-4302-aa45-3a9a9e8aea05.png)
-
-- 2)	Определите связанные функции. Функция модели: определяет модель линейной регрессии wx+b. 
 ```py
+import numpy as np
+import gspread
+
+x = [3, 21, 22, 34, 54, 34, 55, 67, 89, 99]
+x = np.array(x)
+y = [2, 22, 24, 65, 79, 82, 55, 130, 150, 199]
+y = np.array(y)
+
 def model(a, b, x):
   return a*x + b
-```
 
-Функция потерь: функция потерь среднеквадратичной ошибки. 
-```py
 def loss_function(a, b, x, y):
   num = len(x)
   prediction = model(a, b, x)
   return (0.5 / num) * (np.square(prediction - y)).sum()
-```
 
-Функция оптимизации: метод градиентного спуска для нахождения частных производных w и b.
-```py
 def optimize(a, b, x, y):
   num = len(x)
   prediction = model(a, b, x)
-  #Обновление значений a и b, поиском частных производных функций потерь на a и b
   da = (1.0 / num) * ((prediction - y) * x).sum()
   db = (1.0 / num) * ((prediction - y).sum())
   a = a - Lr * da
   b = b - Lr * db
   return a, b
-```
 
-Функция итерации: возвращает значения a и b.
-```py
 def iterate(a, b, x, y, times):
   for i in range(times):
     a, b= optimize(a, b, x, y)
   return a, b
-```
 
-- 3)	Начать итерацию.
-Шаг 1. Инициализация и модель итеративной оптимизации
-```py
 a = np.random.rand(1)
-print(a)
 b = np.random.rand(1)
-print(b)
-Lr = 0.000001
+Lr = 0.0001
 
-a, b = iterate(a, b, x, y, 1)
-prediction = model(a, b, x)
-loss = loss_function(a, b, x, y)
-print(a, b, loss)
-plt.scatter(x, y)
-plt.plot(x, prediction)
+gc = gspread.service_account(filename='centering-talon-365213-6b629bd0007a.json')
+sh = gc.open("Regression")
+
+
+prev_loss = 0
+for index in range(1, 11):
+    a, b = iterate(a, b, x, y, index)
+    prediction = model(a, b, x)
+    loss = loss_function(a, b, x, y)
+    diff_loss = abs(loss - prev_loss)
+    
+    sh.sheet1.update(('A' + str(index)), str(index))
+    sh.sheet1.update(('B' + str(index)), str(loss))
+    sh.sheet1.update(('C' + str(index)), str(diff_loss))
+    print(f'{index})\t{loss}\t{diff_loss}')
+    prev_loss = loss
 ```
 
-Скриншот первой итерации:
+![image](https://user-images.githubusercontent.com/112868100/195166810-e2cd9771-104c-433f-b082-1c2c8de8c1de.png)
+![image](https://user-images.githubusercontent.com/112868100/195166839-8df32f6c-2dee-447b-b70d-de51012bb5c4.png)
 
-![image](https://user-images.githubusercontent.com/112868100/192857601-0d3d4693-eda7-4e5a-b722-ef43cb15e37c.png)
-
-Шаг 2. На второй итерации отображаются значения параметров, значения потерь и эффекты визуализации после итерации.
-```py
-a, b = iterate(a, b, x, y, 2)
-prediction = model(a, b, x)
-loss = loss_function(a, b, x, y)
-print(a, b, loss)
-plt.scatter(x, y)
-plt.plot(x, prediction)
-```
-
-Скриншот второй итерации:
-
-![image](https://user-images.githubusercontent.com/112868100/192857972-46f42a09-2fa4-4adf-ab17-27ac955aca92.png)
-
-
-Шаг 3. Третья итерация показывает значения параметров, значения потерь и эффекты визуализации после итерации.
-```py
-a, b = iterate(a, b, x, y, 3)
-prediction = model(a, b, x)
-loss = loss_function(a, b, x, y)
-print(a, b, loss)
-plt.scatter(x, y)
-plt.plot(x, prediction)
-```
-
-Скриншот третьей итерации:
-
-![image](https://user-images.githubusercontent.com/112868100/192858180-06c8ab54-990d-4989-ac37-b4e11c593898.png)
-
-Шаг 4. На четвертой итерации отображаются значения параметров, значения потерь и эффекты визуализации после итерации.
-```py
-a, b = iterate(a, b, x, y, 4)
-prediction = model(a, b, x)
-loss = loss_function(a, b, x, y)
-print(a, b, loss)
-plt.scatter(x, y)
-plt.plot(x, prediction)
-```
-
-Скриншот четвертой итерации:
-
-![image](https://user-images.githubusercontent.com/112868100/192858343-b40ed9d4-f921-4e1a-8c1a-3202bf55e021.png)
-
-Шаг 5. Пятая итерация показывает значения параметров, значения потерь и эффекты визуализации после итерации.
-```py
-a, b = iterate(a, b, x, y, 5)
-prediction = model(a, b, x)
-loss = loss_function(a, b, x, y)
-print(a, b, loss)
-plt.scatter(x, y)
-plt.plot(x, prediction)
-```
-
-Скриншот пятой итерации:
-
-![image](https://user-images.githubusercontent.com/112868100/192858518-f144dba7-589b-4e40-8d09-c9d295df6028.png)
-
-Шаг 6. 10000-я итерация, показывающая значения параметров, значения потерь и эффекты визуализации после итерации.
-```py
-a, b = iterate(a, b, x, y, 10000)
-prediction = model(a, b, x)
-loss = loss_function(a, b, x, y)
-print(a, b, loss)
-plt.scatter(x, y)
-plt.plot(x, prediction)
-```
-
-Скриншот шестой итерации:
-
-![image](https://user-images.githubusercontent.com/112868100/192858871-0ed9d245-b37d-4994-aeb1-4db752b0fcf7.png)
-
-Анализируя изменения значений в консоли и изменение графиков по итерациям, можно сделать вывод о том, что значения аргументов a и b увеличиваются прямопропорционально увеличению количества итерации, а вот значения потерь, наоборот, уменьшаются.
 
 
 ## Задание 3
-### Изучить код на Python и ответить на вопросы:
 
-Должна ли величина loss стремиться к нулю при изменении исходных данных? Ответьте на вопрос, приведите пример выполнения кода, который подтверждает ваш ответ.
+# Самостоятельно разработать сценарий воспроизведения звукового сопровождения в Unity в зависимости от изменения считанных данных в задании 2.
+
+```py
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.Networking;
+using SimpleJSON;
+
+public class NewBehaviourScript : MonoBehaviour
+{
+    public AudioClip goodSpeak;
+    public AudioClip normalSpeak;
+    public AudioClip badSpeak;
+    private AudioSource selectAudio;
+    private Dictionary<string,float> dataSet = new Dictionary<string, float>();
+    private bool statusStart = false;
+    private int i = 1;
+
+    // Start is called before the first frame update
+    void Start()
+    {
+        StartCoroutine(GoogleSheets());
+    }
+
+    // Update is called once per frame
+    void Update()
+    {
+        if (dataSet["Mon_" + i.ToString()] <= 1 & statusStart == false & i != dataSet.Count)
+        {
+            StartCoroutine(PlaySelectAudioGood());
+            Debug.Log(dataSet["Mon_" + i.ToString()]);
+        }
+
+        if (dataSet["Mon_" + i.ToString()] > 1 & dataSet["Mon_" + i.ToString()] < 777 & statusStart == false & i != dataSet.Count)
+        {
+            StartCoroutine(PlaySelectAudioNormal());
+            Debug.Log(dataSet["Mon_" + i.ToString()]);
+        }
+
+        if (dataSet["Mon_" + i.ToString()] >= 777 & statusStart == false & i != dataSet.Count)
+        {
+            StartCoroutine(PlaySelectAudioBad());
+            Debug.Log(dataSet["Mon_" + i.ToString()]);
+        }
+    }
+
+    IEnumerator GoogleSheets()
+    {
+        UnityWebRequest curentResp = UnityWebRequest.Get("https://sheets.googleapis.com/v4/spreadsheets/12vWQZ3B0NlPQ5amR_TX8YlyQPzmuG5wf9i2bFTItiXw/values/Лист1?key=AIzaSyBzex2EJDWrRDwuE_F-36qc-8pM6mvfDao");
+        yield return curentResp.SendWebRequest();
+        string rawResp = curentResp.downloadHandler.text;
+        var rawJson = JSON.Parse(rawResp);
+        foreach (var itemRawJson in rawJson["values"])
+        {
+            var parseJson = JSON.Parse(itemRawJson.ToString());
+            var selectRow = parseJson[0].AsStringList;
+            dataSet.Add(("Mon_" + selectRow[0]), float.Parse(selectRow[2]));
+        }
+    }
+
+    IEnumerator PlaySelectAudioGood()
+    {
+        statusStart = true;
+        selectAudio = GetComponent<AudioSource>();
+        selectAudio.clip = goodSpeak;
+        selectAudio.Play();
+        yield return new WaitForSeconds(3);
+        statusStart = false;
+        i++;
+    }
+    IEnumerator PlaySelectAudioNormal()
+    {
+        statusStart = true;
+        selectAudio = GetComponent<AudioSource>();
+        selectAudio.clip = normalSpeak;
+        selectAudio.Play();
+        yield return new WaitForSeconds(3);
+        statusStart = false;
+        i++;
+    }
+    IEnumerator PlaySelectAudioBad()
+    {
+        statusStart = true;
+        selectAudio = GetComponent<AudioSource>();
+        selectAudio.clip = badSpeak;
+        selectAudio.Play();
+        yield return new WaitForSeconds(4);
+        statusStart = false;
+        i++;
+    }
+}
+```
+Теперь считываются данные из таблицы Регрессий
+- для значений меньше 1: "Люди восхищаются Вами, мой Лорд"
+- для значений в диапозоне от 1 до 777: "Люди доверяют Вам, милорд"
+- для значение больших 777: "Вы самый жестокий тиран в королестве, Ваша Светлость".
+
 
 
 ## Выводы
 
-В ходе лабораторной работы, я познакомился с основными операторами в Python на примере реализции линейной регресии. При выполнении задач, мною были изучены: оператор вывода данных на консоль в Python и Unity, библиотеки matplotlib и numpy для вычисления и вывода графиков на экран, различные методы, содержащиеся в данных библиотеках. В ходе выполнения второго задания были выявлены закономерности увеличения значений аргументов a и b с увеличением итерации линейной регрессии, и наоборот уменьшением потерь с увеличением итераций. 
+В ходе лабораторной работы, я познакомился с программными средствами для организции передачи данных между инструментами google, Python и Unity. Научился взаимедействовать с помощью кода на языках C# и Python с Google таблицами. Узнал что такое API-ключ, ознакомился с основами работы в Console Cloud Google.
 
 | Plugin | README |
 | ------ | ------ |
