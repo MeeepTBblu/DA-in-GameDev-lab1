@@ -122,7 +122,7 @@
     
 По предложенным видео-материалам пишем код для установки соотвествующих команд
 
-```cmd
+```py
 conda create -n MLAgents python=3.6
 conda activate MLAgents
 ```
