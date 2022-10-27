@@ -51,10 +51,14 @@
 ![image](https://user-images.githubusercontent.com/112868100/198266254-022aa263-1bd4-4018-8df6-6d491663979d.png)
 
 
+
+
 - Скачайте папку с ML агентом. Вы найдете ее в облаке с исходными файлами к лабораторной работе – ml-agents-release_19.
 
 Скачиваем папку по предложенной ссылке
 ![image](https://user-images.githubusercontent.com/112868100/198266545-50ebda54-c673-4469-af33-40ffe3a82376.png)
+
+
 
 
 - В созданный проект добавьте ML Agent, выбрав Window - Package Manager - Add Package from disk. Последовательно добавьте .json – файлы:
@@ -74,16 +78,22 @@
 ![image](https://user-images.githubusercontent.com/112868100/198269675-e5d3221b-39ce-488f-a8f4-e334bc1d9285.png)
 
 
+
+
 - Если все сделано правильно, то во вкладке с компонентами (Components) внутри Unity вы увидите строку ML Agent.
 
 Наблюдаем появление соответствующего компонента в Components, значит все сделано правильно
 ![image](https://user-images.githubusercontent.com/112868100/198269926-43866500-8d9c-4ef1-b77e-c7d8b5d2d3d8.png)
 
 
+
+
 - Далее запускаем Anaconda Prompt для возможности запуска команд через консоль.
 
 Следующим шагом заупскаем Anaconda Promt от имени администратора
 ![image](https://user-images.githubusercontent.com/112868100/198273551-ebd457d7-c07d-4deb-81df-edbd2336c05f.png)
+
+
 
 
 - Далее пишем серию команд для создания и активации нового ML-агента, а также для скачивания необходимых библиотек:
