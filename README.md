@@ -357,7 +357,7 @@ mlagents-learn rollerball_config.yaml --run-id=RollerBall --force
 
 ![image](https://user-images.githubusercontent.com/112868100/201101721-81fb793a-4133-4e34-a9dd-266fdd9843f0.png)
 
-![Uploading 2022-11-10 18-43-38.gif…]()
+![2022-11-10 18-43-38](https://user-images.githubusercontent.com/112868100/201108495-0ac9c5e1-a1a0-4258-966f-484dada46daf.gif)
 
 
 Выводы: С у увеличением количества моделей (учавствующих в каждой итерации одновременно), нейронная сеть быстрее обучается.
