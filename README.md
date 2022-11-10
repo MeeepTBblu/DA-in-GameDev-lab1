@@ -6,7 +6,7 @@
 
 | Задание | Выполнение | Баллы |
 | ------ | ------ | ------ |
-| Задание 1 | # | 60 |
+| Задание 1 | * | 60 |
 | Задание 2 | # | 20 |
 | Задание 3 | # | 20 |
 
@@ -236,7 +236,52 @@ public class RollerAgent : Agent
     - Space Size = 8
     - Continous Actions = 2
     
-![image](https://user-images.githubusercontent.com/112868100/201086580-eebdf140-1104-4dd8-b1d6-32002adb00a6.png)
+![image](https://user-images.githubusercontent.com/112868100/201086822-5ecc322e-1aaf-477a-984e-6b73b9c2819a.png)
+
+В корневой папке проекта создаем файл rollerball_config.yaml
+
+![image](https://user-images.githubusercontent.com/112868100/201087487-fe79f1bc-99b8-4b3d-8ddf-4f32b498cfef.png)
+
+В него записать код из предложенного видеоматериала
+
+```py
+behaviors:
+  RollerBall:
+    trainer_type: ppo
+    hyperparameters:
+      batch_size: 10
+      buffer_size: 100
+      learning_rate: 3.0e-4
+      beta: 5.0e-4
+      epsilon: 0.2
+      lambd: 0.99
+      num_epoch: 3
+      learning_rate_schedule: linear
+    network_settings:
+      normalize: false
+      hidden_units: 128
+      num_layers: 2
+    reward_signals:
+      extrinsic:
+        gamma: 0.99
+        strength: 1.0
+    max_steps: 500000
+    time_horizon: 64
+    summary_freq: 10000
+```
+
+Далее в консоли прописать команду 
+
+```py
+mlagents-learn rollerball_config.yaml --run-id=RollerBall --force
+```
+
+И проверить в Unity работу MLAgent
+
+![image](https://user-images.githubusercontent.com/112868100/201093988-4c02dca6-91b3-438b-890d-1b9944487854.png)
+
+
+![2022-11-10-17-45-11](https://user-images.githubusercontent.com/112868100/201096512-dcb4f683-c50c-4267-ab69-c32052552091.gif)
 
 
 
