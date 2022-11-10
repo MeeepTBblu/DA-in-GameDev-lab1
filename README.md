@@ -7,7 +7,7 @@
 | Задание | Выполнение | Баллы |
 | ------ | ------ | ------ |
 | Задание 1 | * | 60 |
-| Задание 2 | # | 20 |
+| Задание 2 | * | 20 |
 | Задание 3 | # | 20 |
 
 знак "*" - задание выполнено; знак "#" - задание не выполнено;
@@ -365,7 +365,33 @@ mlagents-learn rollerball_config.yaml --run-id=RollerBall --force
 ## Задание 2
 ###  Подробно опишите каждую строку файла конфигурации нейронной сети, доступного в папке с файлами проекта по ссылке. Самостоятельно найдите информацию о компонентах Decision Requester, Behavior Parameters, добавленных на сфере.
 
+- Продумблируем код из файла, используемого в прошлом задании:
 
+```py
+behaviors:
+  RollerBall:
+    trainer_type: ppo
+    hyperparameters:
+      batch_size: 10
+      buffer_size: 100
+      learning_rate: 3.0e-4
+      beta: 5.0e-4
+      epsilon: 0.2
+      lambd: 0.99
+      num_epoch: 3
+      learning_rate_schedule: linear
+    network_settings:
+      normalize: false
+      hidden_units: 128
+      num_layers: 2
+    reward_signals:
+      extrinsic:
+        gamma: 0.99
+        strength: 1.0
+    max_steps: 500000
+    time_horizon: 64
+    summary_freq: 10000
+```
 --------------------------------------------------------------------------------------------
 
 ### Behaviors
@@ -494,7 +520,9 @@ mlagents-learn rollerball_config.yaml --run-id=RollerBall --force
 
 ## Выводы
 
-В ходе лабораторной работы, я познакомился с программными средствами для организции передачи данных между инструментами google, Python и Unity. Научился взаимедействовать с помощью кода на языках C# и Python с Google таблицами. Узнал что такое API-ключ, ознакомился с основами работы в Console Cloud Google.
+В ходе лабораторной работы, я познакомился с программными средствами для создания программы с машинным обучением. Познакомился с библиотеками -  mlagents и torch.
+Научился взаимодействовать объектами, проводить итерации для машинного обучения и выводить результаты на объекты.
+Познакомился с новыми компонентами объектов - Decision Requester, Behavior Parameters.
 
 | Plugin | README |
 | ------ | ------ |
