@@ -329,25 +329,23 @@ mlagents-learn rollerball_config.yaml --run-id=RollerBall --force
 
 ![2022-11-10 17-45-11](https://user-images.githubusercontent.com/112868100/201107082-df7cdb0a-548e-4afc-b57d-c0ba48c98885.gif)
 
-![2022-11-10-17-45-11](https://user-images.githubusercontent.com/112868100/201096512-dcb4f683-c50c-4267-ab69-c32052552091.gif)
-
 --------------------------------------------------------------------------------------------
 
 Работа модели с 3-мя сценами:
 
-![3](https://user-images.githubusercontent.com/112868100/201098247-b4f88378-952a-41ff-9fa0-dc2e1f0e91cd.gif)
+![3](https://user-images.githubusercontent.com/112868100/201108236-5fdde436-a47a-4c1a-8c27-6a757cc3c4b1.gif)
 
 --------------------------------------------------------------------------------------------
 
 Работа модели с 9-ю сценами:
 
-![9](https://user-images.githubusercontent.com/112868100/201098278-9b6335fb-4df6-4e42-9c16-c1be3b095e87.gif)
+![9](https://user-images.githubusercontent.com/112868100/201108235-a4bcddb5-7311-40b8-ac34-21196e067bae.gif)
 
 --------------------------------------------------------------------------------------------
 
 Работа модели с 27-ю сценами
 
-![27](https://user-images.githubusercontent.com/112868100/201098292-f654cba6-00da-4f16-bc48-5863bde9394a.gif)
+![27](https://user-images.githubusercontent.com/112868100/201108256-78d5aa24-d810-43ee-b858-be5353c9e6fb.gif)
 
 --------------------------------------------------------------------------------------------
 
@@ -359,8 +357,7 @@ mlagents-learn rollerball_config.yaml --run-id=RollerBall --force
 
 ![image](https://user-images.githubusercontent.com/112868100/201101721-81fb793a-4133-4e34-a9dd-266fdd9843f0.png)
 
-
-![end](https://user-images.githubusercontent.com/112868100/201102094-842a9fb2-c9df-40ba-85d3-e49e1e28bc12.gif)
+![Uploading 2022-11-10 18-43-38.gif…]()
 
 
 Выводы: С у увеличением количества моделей (учавствующих в каждой итерации одновременно), нейронная сеть быстрее обучается.
