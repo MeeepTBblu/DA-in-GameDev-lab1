@@ -367,7 +367,7 @@ mlagents-learn rollerball_config.yaml --run-id=RollerBall --force
 ###  Подробно опишите каждую строку файла конфигурации нейронной сети, доступного в папке с файлами проекта по ссылке. Самостоятельно найдите информацию о компонентах Decision Requester, Behavior Parameters, добавленных на сфере.
 
 
-####behaviors
+### Behaviors
 Описание поведения объекта
 
 RollerBall
