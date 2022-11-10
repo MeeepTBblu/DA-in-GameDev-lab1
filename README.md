@@ -138,7 +138,135 @@ pip install mlagents==0.28.0
 
 --------------------------------------------------------------------------------------------
 
+```
+pip install torch--1.7.1 -f https://download.pytorch.org/wh1/torch_stable.html
+```
+
 ![image](https://user-images.githubusercontent.com/112868100/198280272-9bdaf79d-ec84-4f07-8a82-37c2a4c1b368.png)
+
+Переключаем MlAgents на дикректорию с проектом
+
+![image](https://user-images.githubusercontent.com/112868100/201081188-d4f3b12d-8b2d-47d0-8e20-d3416fd40d60.png)
+
+Создаем на сцене три элемента
+- Plane (Floor) с координатами (0, 0, 0)
+- Cube (Target) с координатами (3, 0.5, 3)
+- Sphere (RollerAgent) с координатами (0, 0.5, 0) и компонентом RigidBody
+
+![image](https://user-images.githubusercontent.com/112868100/201082094-cb5605ec-350f-43c2-b9f9-271288e0678d.png)
+
+В папке проекта создаем новую папку Materials а которой соотвественно будут храниться материалы для наших объектов
+- для RollerTarget - материал RollerTarget
+- для Target - материал Target
+
+![image](https://user-images.githubusercontent.com/112868100/201082734-181a3cf5-6f98-4e27-886f-7f7b8b96eb1f.png)
+
+Создаем пустой объект с названием TargetArea, и переносим наши объекты в него, для удобства взаимодействия (группировка)
+
+![image](https://user-images.githubusercontent.com/112868100/201083082-90b65493-ee97-4bca-82f3-1b6a980e6b2b.png)
+
+Создаем в папке проекта папку Scripts для наших будущих скриптов и в качестве компонента для RollerAgent добавляем скрипт с одноименным названием
+Код для скрипта следующий:
+
+```py
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+using Unity.MLAgents;
+using Unity.MLAgents.Sensors;
+using Unity.MLAgents.Actuators;
+
+public class RollerAgent : Agent
+{
+    Rigidbody rBody;
+    // Start is called before the first frame update
+    void Start()
+    {
+        rBody = GetComponent<Rigidbody>();
+    }
+
+    public Transform Target;
+    public override void OnEpisodeBegin()
+    {
+        if (this.transform.localPosition.y < 0)
+        {
+            this.rBody.angularVelocity = Vector3.zero;
+            this.rBody.velocity = Vector3.zero;
+            this.transform.localPosition = new Vector3(0, 0.5f, 0);
+        }
+
+        Target.localPosition = new Vector3(Random.value * 8 - 4, 0.5f, Random.value * 8 - 4);
+    }
+    public override void CollectObservations(VectorSensor sensor)
+    {
+        sensor.AddObservation(Target.localPosition);
+        sensor.AddObservation(this.transform.localPosition);
+        sensor.AddObservation(rBody.velocity.x);
+        sensor.AddObservation(rBody.velocity.z);
+    }
+    public float forceMultiplier = 10;
+    public override void OnActionReceived(ActionBuffers actionBuffers)
+    {
+        Vector3 controlSignal = Vector3.zero;
+        controlSignal.x = actionBuffers.ContinuousActions[0];
+        controlSignal.z = actionBuffers.ContinuousActions[1];
+        rBody.AddForce(controlSignal * forceMultiplier);
+
+        float distanceToTarget = Vector3.Distance(this.transform.localPosition, Target.localPosition);
+
+        if (distanceToTarget < 1.42f)
+        {
+            SetReward(1.0f);
+            EndEpisode();
+        }
+        else if (this.transform.localPosition.y < 0)
+        {
+            EndEpisode();
+        }
+    }
+}
+```
+
+Далее в компонентах RollerAgent:
+- Прикрепляем к значею Target объект Target
+- Прикрепляем компонент Decision Requester
+    - Decision Period = 10
+- Прикрепляем компонент Behavior Parameters
+    - Behavior Name = RollerBall
+    - Space Size = 8
+    - Continous Actions = 2
+    
+![image](https://user-images.githubusercontent.com/112868100/201086580-eebdf140-1104-4dd8-b1d6-32002adb00a6.png)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
