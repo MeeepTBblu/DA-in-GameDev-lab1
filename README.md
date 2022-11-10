@@ -281,11 +281,24 @@ mlagents-learn rollerball_config.yaml --run-id=RollerBall --force
 ![image](https://user-images.githubusercontent.com/112868100/201093988-4c02dca6-91b3-438b-890d-1b9944487854.png)
 
 
+Работа модели с 1-ой сценой:
+
 ![2022-11-10-17-45-11](https://user-images.githubusercontent.com/112868100/201096512-dcb4f683-c50c-4267-ab69-c32052552091.gif)
 
 
+Работа модели с 3-мя сценами:
+
+![3](https://user-images.githubusercontent.com/112868100/201098247-b4f88378-952a-41ff-9fa0-dc2e1f0e91cd.gif)
 
 
+Работа модели с 9-ю сценами:
+
+![9](https://user-images.githubusercontent.com/112868100/201098278-9b6335fb-4df6-4e42-9c16-c1be3b095e87.gif)
+
+
+Работа модели с 27-ю сценами
+
+![27](https://user-images.githubusercontent.com/112868100/201098292-f654cba6-00da-4f16-bc48-5863bde9394a.gif)
 
 
 
