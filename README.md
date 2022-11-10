@@ -265,6 +265,10 @@ public class RollerAgent : Agent
 
 --------------------------------------------------------------------------------------------
 
+- В корень проекта добавьте файл конфигурации нейронной сети, доступный в папке с файлами проекта по ссылке.
+
+--------------------------------------------------------------------------------------------
+
 В корневой папке проекта создаем файл rollerball_config.yaml
 
 ![image](https://user-images.githubusercontent.com/112868100/201087487-fe79f1bc-99b8-4b3d-8ddf-4f32b498cfef.png)
@@ -301,6 +305,10 @@ behaviors:
 
 --------------------------------------------------------------------------------------------
 
+- Запустите работу ml-агента
+
+--------------------------------------------------------------------------------------------
+
 Далее в консоли прописать команду 
 
 ```py
@@ -313,6 +321,9 @@ mlagents-learn rollerball_config.yaml --run-id=RollerBall --force
 
 --------------------------------------------------------------------------------------------
 
+- Сделайте 3, 9, 27 копий модели «Плоскость-Сфера-Куб», запустите симуляцию сцены и наблюдайте за результатом обучения модели.
+
+--------------------------------------------------------------------------------------------
 
 Работа модели с 1-ой сценой:
 
@@ -320,13 +331,11 @@ mlagents-learn rollerball_config.yaml --run-id=RollerBall --force
 
 --------------------------------------------------------------------------------------------
 
-
 Работа модели с 3-мя сценами:
 
 ![3](https://user-images.githubusercontent.com/112868100/201098247-b4f88378-952a-41ff-9fa0-dc2e1f0e91cd.gif)
 
 --------------------------------------------------------------------------------------------
-
 
 Работа модели с 9-ю сценами:
 
@@ -334,211 +343,30 @@ mlagents-learn rollerball_config.yaml --run-id=RollerBall --force
 
 --------------------------------------------------------------------------------------------
 
-
 Работа модели с 27-ю сценами
 
 ![27](https://user-images.githubusercontent.com/112868100/201098292-f654cba6-00da-4f16-bc48-5863bde9394a.gif)
 
 --------------------------------------------------------------------------------------------
 
+- После завершения обучения проверьте работу модели.
+
+--------------------------------------------------------------------------------------------
+
+Для проверки работы модели переносим файл RollerBall.onnx из результатов в assets, и переносим его в поле Model
+
+![image](https://user-images.githubusercontent.com/112868100/201101721-81fb793a-4133-4e34-a9dd-266fdd9843f0.png)
 
 
+![end](https://user-images.githubusercontent.com/112868100/201102094-842a9fb2-c9df-40ba-85d3-e49e1e28bc12.gif)
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+Выводы: С у увеличением количества моделей (учавствующих в каждой итерации одновременно), нейронная сеть быстрее обучается.
 
 ## Задание 2
-### Реализовать запись в Google-таблицу набора данных, полученных с помощью линейной регрессии из лабораторной работы № 1. 
+###  Подробно опишите каждую строку файла конфигурации нейронной сети, доступного в папке с файлами проекта по ссылке. Самостоятельно найдите информацию о компонентах Decision Requester, Behavior Parameters, добавленных на сфере.
 
 
-Очистим таблицу от наших данных, и перепишем код в соотвествии с заданием
-
-![image](https://user-images.githubusercontent.com/112868100/195161496-9037bbc8-841d-43f2-8bf0-9f18e0997f31.png)
-
-
-Большая часть кода (а именно функции) остаются без изменений, меняется только обработка итераций
-
-```py
-import numpy as np
-import gspread
-
-x = [3, 21, 22, 34, 54, 34, 55, 67, 89, 99]
-x = np.array(x)
-y = [2, 22, 24, 65, 79, 82, 55, 130, 150, 199]
-y = np.array(y)
-
-def model(a, b, x):
-  return a*x + b
-
-def loss_function(a, b, x, y):
-  num = len(x)
-  prediction = model(a, b, x)
-  return (0.5 / num) * (np.square(prediction - y)).sum()
-
-def optimize(a, b, x, y):
-  num = len(x)
-  prediction = model(a, b, x)
-  da = (1.0 / num) * ((prediction - y) * x).sum()
-  db = (1.0 / num) * ((prediction - y).sum())
-  a = a - Lr * da
-  b = b - Lr * db
-  return a, b
-
-def iterate(a, b, x, y, times):
-  for i in range(times):
-    a, b= optimize(a, b, x, y)
-  return a, b
-
-a = np.random.rand(1)
-b = np.random.rand(1)
-Lr = 0.0001
-
-gc = gspread.service_account(filename='centering-talon-365213-6b629bd0007a.json')
-sh = gc.open("Regression")
-
-
-prev_loss = 0
-for index in range(1, 11):
-    a, b = iterate(a, b, x, y, index)
-    prediction = model(a, b, x)
-    loss = loss_function(a, b, x, y)
-    diff_loss = abs(loss - prev_loss)
-    
-    sh.sheet1.update(('A' + str(index)), str(index))
-    sh.sheet1.update(('B' + str(index)), str(loss))
-    sh.sheet1.update(('C' + str(index)), str(diff_loss))
-    print(f'{index})\t{loss}\t{diff_loss}')
-    prev_loss = loss
-```
-
-![image](https://user-images.githubusercontent.com/112868100/195166810-e2cd9771-104c-433f-b082-1c2c8de8c1de.png)
-![image](https://user-images.githubusercontent.com/112868100/195166839-8df32f6c-2dee-447b-b70d-de51012bb5c4.png)
-
-
-
-## Задание 3.
-
-### Самостоятельно разработать сценарий воспроизведения звукового сопровождения в Unity в зависимости от изменения считанных данных в задании 2.
-
-```py
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-using UnityEngine.Networking;
-using SimpleJSON;
-
-public class NewBehaviourScript : MonoBehaviour
-{
-    public AudioClip goodSpeak;
-    public AudioClip normalSpeak;
-    public AudioClip badSpeak;
-    private AudioSource selectAudio;
-    private Dictionary<string,float> dataSet = new Dictionary<string, float>();
-    private bool statusStart = false;
-    private int i = 1;
-
-    // Start is called before the first frame update
-    void Start()
-    {
-        StartCoroutine(GoogleSheets());
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        if (dataSet["Mon_" + i.ToString()] <= 1 & statusStart == false & i != dataSet.Count)
-        {
-            StartCoroutine(PlaySelectAudioGood());
-            Debug.Log(dataSet["Mon_" + i.ToString()]);
-        }
-
-        if (dataSet["Mon_" + i.ToString()] > 1 & dataSet["Mon_" + i.ToString()] < 777 & statusStart == false & i != dataSet.Count)
-        {
-            StartCoroutine(PlaySelectAudioNormal());
-            Debug.Log(dataSet["Mon_" + i.ToString()]);
-        }
-
-        if (dataSet["Mon_" + i.ToString()] >= 777 & statusStart == false & i != dataSet.Count)
-        {
-            StartCoroutine(PlaySelectAudioBad());
-            Debug.Log(dataSet["Mon_" + i.ToString()]);
-        }
-    }
-
-    IEnumerator GoogleSheets()
-    {
-        UnityWebRequest curentResp = UnityWebRequest.Get("https://sheets.googleapis.com/v4/spreadsheets/12vWQZ3B0NlPQ5amR_TX8YlyQPzmuG5wf9i2bFTItiXw/values/Лист1?key=AIzaSyBzex2EJDWrRDwuE_F-36qc-8pM6mvfDao");
-        yield return curentResp.SendWebRequest();
-        string rawResp = curentResp.downloadHandler.text;
-        var rawJson = JSON.Parse(rawResp);
-        foreach (var itemRawJson in rawJson["values"])
-        {
-            var parseJson = JSON.Parse(itemRawJson.ToString());
-            var selectRow = parseJson[0].AsStringList;
-            dataSet.Add(("Mon_" + selectRow[0]), float.Parse(selectRow[2]));
-        }
-    }
-
-    IEnumerator PlaySelectAudioGood()
-    {
-        statusStart = true;
-        selectAudio = GetComponent<AudioSource>();
-        selectAudio.clip = goodSpeak;
-        selectAudio.Play();
-        yield return new WaitForSeconds(3);
-        statusStart = false;
-        i++;
-    }
-    IEnumerator PlaySelectAudioNormal()
-    {
-        statusStart = true;
-        selectAudio = GetComponent<AudioSource>();
-        selectAudio.clip = normalSpeak;
-        selectAudio.Play();
-        yield return new WaitForSeconds(3);
-        statusStart = false;
-        i++;
-    }
-    IEnumerator PlaySelectAudioBad()
-    {
-        statusStart = true;
-        selectAudio = GetComponent<AudioSource>();
-        selectAudio.clip = badSpeak;
-        selectAudio.Play();
-        yield return new WaitForSeconds(4);
-        statusStart = false;
-        i++;
-    }
-}
-```
-Теперь считываются данные из таблицы Регрессий
-- для значений меньше 1: "Люди восхищаются Вами, мой Лорд"
-- для значений в диапозоне от 1 до 777: "Люди доверяют Вам, милорд"
-- для значение больших 777: "Вы самый жестокий тиран в королестве, Ваша Светлость".
 
 
 
