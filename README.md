@@ -313,8 +313,8 @@ public class Perceptron : MonoBehaviour
 {
 
 	public TrainingSet[] ts_OR;		// <--- операция A OR B
-	public TrainingSet[] ts_HAND;		// <--- операция A HAND B
-	public TrainingSet[] ts_XOR;		// <--- операция (A OR B) AND (A HAND B)
+	public TrainingSet[] ts_NAND;		// <--- операция A NAND B
+	public TrainingSet[] ts_XOR;		// <--- операция (A OR B) AND (A NAND B)
 	double[] weights = { 0, 0 };
 	double bias = 0;
 	double totalError = 0;
