@@ -304,10 +304,109 @@ public class Perceptron : MonoBehaviour
 
 						A XOR B = (A OR B) AND (A NAND B)  
 						
+Мы можем сделать вывод, что если мы добавим еще два слоя перцептрона (**OR** и **HAND**) натренируем сначала их, а затем начнем тренировать конечный **AND** этих операций с выходом (0, 1, 1, 0) то мы в теории можем получить ответ, но для этого нужно вносить изменения в код: 
+
+(21) Для начала вместо одной переменной типа TrainingSet определим 3, каждая из которых будет отвечать за конкретную операцию:
+
+``` C#
+public class Perceptron : MonoBehaviour
+{
+
+	public TrainingSet[] ts_OR;		// <--- операция A OR B
+	public TrainingSet[] ts_HAND;		// <--- операция A HAND B
+	public TrainingSet[] ts_XOR;		// <--- операция (A OR B) AND (A HAND B)
+	double[] weights = { 0, 0 };
+	double bias = 0;
+	double totalError = 0;
+}
+```
 
 
+(21) Затем переназначим методы внутри класса, которые раньше взаимодействовали с переменной **ts**, теперь они будут дополнительно полуать на вход ту операцию, которую обучают в данный момент
 
 
+``` C#
+public class Perceptron : MonoBehaviour
+{
+
+	public TrainingSet[] ts_OR;
+	public TrainingSet[] ts_HAND;
+	public TrainingSet[] ts_XOR;
+	double[] weights = { 0, 0 };
+	double bias = 0;
+	double totalError = 0;
+
+	double DotProductBias(double[] v1, double[] v2)
+	{
+		if (v1 == null || v2 == null)
+			return -1;
+
+		if (v1.Length != v2.Length)
+			return -1;
+
+		double d = 0;
+		for (int x = 0; x < v1.Length; x++)
+		{
+			d += v1[x] * v2[x];
+		}
+
+		d += bias;
+
+		return d;
+	}
+
+	double CalcOutput(int i, TrainingSet[] ts)
+	{
+		double dp = DotProductBias(weights, ts[i].input);
+		if (dp > 0) return (1);
+		return (0);
+	}
+
+	void InitialiseWeights()
+	{
+		for (int i = 0; i < weights.Length; i++)
+		{
+			weights[i] = Random.Range(-1.0f, 1.0f);
+		}
+		bias = Random.Range(-1.0f, 1.0f);
+	}
+
+	void UpdateWeights(int j, TrainingSet[] ts)
+	{
+		double error = ts[j].output - CalcOutput(j, ts);
+		totalError += Mathf.Abs((float)error);
+		for (int i = 0; i < weights.Length; i++)
+		{
+			weights[i] = weights[i] + error * ts[j].input[i];
+		}
+		bias += error;
+	}
+
+	double CalcOutput(double i1, double i2)
+	{
+		double[] inp = new double[] { i1, i2 };
+		double dp = DotProductBias(weights, inp);
+		if (dp > 0) return (1);
+		return (0);
+	}
+
+	void Train(int epochs, TrainingSet[] ts)
+	{
+		InitialiseWeights();
+
+		for (int e = 0; e < epochs; e++)
+		{
+			totalError = 0;
+			for (int t = 0; t < ts.Length; t++)
+			{
+				UpdateWeights(t, ts);
+				Debug.Log("W1: " + (weights[0]) + " W2: " + (weights[1]) + " B: " + bias);
+			}
+			Debug.Log("TOTAL ERROR: " + totalError);
+		}
+	}
+}
+```
 
 
 
