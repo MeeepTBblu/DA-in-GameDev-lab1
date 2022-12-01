@@ -53,7 +53,7 @@
 
 (2) В папку проекта добавляем скрипт (Perceptron.cs) который уже написан преподавателями и предоставлен нам для выполнения лабораторной работы
 
-``` py
+``` C#
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -330,7 +330,7 @@ public class Perceptron : MonoBehaviour
 {
 
 	public TrainingSet[] ts_OR;
-	public TrainingSet[] ts_HAND;
+	public TrainingSet[] ts_NAND;
 	public TrainingSet[] ts_XOR;
 	double[] weights = { 0, 0 };
 	double bias = 0;
@@ -355,7 +355,7 @@ public class Perceptron : MonoBehaviour
 		return d;
 	}
 
-	double CalcOutput(int i, TrainingSet[] ts)
+	double CalcOutput(int i, TrainingSet[] ts)		// <--- Here
 	{
 		double dp = DotProductBias(weights, ts[i].input);
 		if (dp > 0) return (1);
@@ -371,7 +371,7 @@ public class Perceptron : MonoBehaviour
 		bias = Random.Range(-1.0f, 1.0f);
 	}
 
-	void UpdateWeights(int j, TrainingSet[] ts)
+	void UpdateWeights(int j, TrainingSet[] ts)		// <--- Here
 	{
 		double error = ts[j].output - CalcOutput(j, ts);
 		totalError += Mathf.Abs((float)error);
@@ -390,7 +390,7 @@ public class Perceptron : MonoBehaviour
 		return (0);
 	}
 
-	void Train(int epochs, TrainingSet[] ts)
+	void Train(int epochs, TrainingSet[] ts)		// <--- And here
 	{
 		InitialiseWeights();
 
@@ -408,8 +408,42 @@ public class Perceptron : MonoBehaviour
 }
 ```
 
+(22) Наконец добавим в метод **Start()** два новых массива, которые будут хранить выходные значения для ts_OR и ts_NAND. А так же добавим их обучения: 
+
+``` C#
+void Start()
+{
+	double[] ts_OR_values = new double [ts_OR.Length];
+	double[] ts_NAND_values = new double[ts_NAND.Length];
 
 
+	Train(6, ts_OR);
+	for (int i = 0; i < ts_OR.Length; i++)
+	{
+		ts_OR_values[i] = CalcOutput(ts_OR[i].input[0], ts_OR[i].input[1]);
+	}
+
+	Train(6, ts_NAND);
+	for (int i = 0; i < ts_OR.Length; i++)
+	{
+		ts_NAND_values[i] = CalcOutput(ts_NAND[i].input[0], ts_NAND[i].input[1]);
+	}
+
+
+	Train(6, ts_XOR);
+        Debug.Log("Test 0 0: " + CalcOutput(ts_OR_values[0], ts_NAND_values[0]));
+        Debug.Log("Test 0 1: " + CalcOutput(ts_OR_values[1], ts_NAND_values[1]));
+        Debug.Log("Test 1 0: " + CalcOutput(ts_OR_values[2], ts_NAND_values[2]));
+        Debug.Log("Test 1 1: " + CalcOutput(ts_OR_values[3], ts_NAND_values[3]));
+}
+```
+
+
+(24) Запустим получившуюся программу несколько раз и получим на выходе верные значения, что не может не радовать
+![image](https://user-images.githubusercontent.com/100014698/205064483-ec9ee1ce-c26e-4965-a80c-87de8567d8df.png)
+
+## Вывод по XOR (2): 
+Однослойной перцептрон не способен решать нелинейные задачи, и поэтому для нахождения весов для функции **XOR** нам нужно добавлять дополнительные слои, что мы и сделали.
 
 ## Выводы
 
